@@ -11,17 +11,10 @@ const ADDRESS = "0x8499c62EC0B4F1f2F0eD93e67e19587F6b94afaF";
 const ABI = ["event BurnMintToken(address from)"];
 
 // Setup contract instance.
-// const provider = new ethers.providers.InfuraWebSocketProvider(
-//   "mainnet",
-//   process.env.KEY
-// );
-const provider = new ethers.providers.InfuraProvider(
+const provider = new ethers.providers.InfuraWebSocketProvider(
   "mainnet",
   process.env.KEY
 );
-
-// TODO: Remove once in prod.
-provider.resetEventsBlock(13230249);
 
 const contract = new ethers.Contract(ADDRESS, ABI, provider);
 
@@ -31,7 +24,7 @@ const discord = new Discord.Webhook(process.env.DISCORD?.toString()!);
 // Listen to new events.
 contract.on("BurnMintToken", async (from, event) => {
   const name = (await provider.lookupAddress(from)) || from;
-  
+
   console.log(`\naddress = ${name}\ntx      = ${event.transactionHash}\n`);
 
   const message = new Discord.MessageBuilder()
