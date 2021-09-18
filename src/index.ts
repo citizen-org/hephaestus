@@ -3,7 +3,6 @@ import { config } from "dotenv";
 config();
 
 // Import dependencies.
-import axios from "axios";
 import { ethers } from "ethers";
 import Twitter from "twitter-lite";
 import Discord from "webhook-discord";
@@ -32,33 +31,34 @@ const twitter = new Twitter({
 });
 
 // Helper to fetch token ID.
-const fetchTokenId = async (
-  address: string,
-  transaction: string
-): Promise<string> => {
-  let tokenId = "XXX";
-
-  const res = await axios.get(
-    `https://api.etherscan.io/api?module=account&action=tokennfttx&contractaddress=0x355929193308e157760824ba860390924d77fab9&address=${address}&apikey=${process.env.ETHERSCAN}`
+const fetchTokenId = async (address: string): Promise<string> => {
+  const nft = new ethers.Contract(
+    "0x355929193308e157760824bA860390924d77FaB9",
+    [
+      "function balanceOf(address owner) external view returns (uint256 balance)",
+      "function tokenOfOwnerByIndex(address owner, uint256 index) external view returns (uint256 tokenId)",
+    ],
+    provider
   );
 
-  if (res.data) {
-    const filtered = res.data.result.filter(
-      (item: any) => item.hash === transaction
-    );
+  const balance = (await nft.balanceOf(address)) as number;
 
-    if (filtered.length) {
-      tokenId = filtered[0].tokenID.padStart(3, "0");
-    }
+  if (balance > 0) {
+    const tokenId = (await nft.tokenOfOwnerByIndex(
+      address,
+      balance - 1
+    )) as number;
+
+    return tokenId.toString().padStart(3, "0");
   }
 
-  return tokenId;
+  return "XXX";
 };
 
 // Listen to new events.
 contract.on("BurnMintToken", async (from, event) => {
   const name = (await provider.lookupAddress(from)) || from;
-  const tokenId = await fetchTokenId(from, event.transactionHash);
+  const tokenId = await fetchTokenId(from);
 
   console.log(
     `\naddress = ${name}\ntx      = ${event.transactionHash}\ntokenId = ${tokenId}`
