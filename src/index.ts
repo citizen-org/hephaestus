@@ -5,6 +5,7 @@ config();
 // Import dependencies.
 import axios from "axios";
 import { ethers } from "ethers";
+import Twitter from "twitter-lite";
 import Discord from "webhook-discord";
 
 // Define constants.
@@ -21,6 +22,14 @@ const contract = new ethers.Contract(ADDRESS, ABI, provider);
 
 // Setup Discord instance.
 const discord = new Discord.Webhook(process.env.DISCORD?.toString()!);
+
+// Setup Twitter instance.
+const twitter = new Twitter({
+  consumer_key: process.env.CONSUMER_KEY?.toString()!,
+  consumer_secret: process.env.CONSUMER_SECRET?.toString()!,
+  access_token_key: process.env.ACCESS_KEY?.toString()!,
+  access_token_secret: process.env.ACCESS_SECRET?.toString()!,
+});
 
 // Helper to fetch token ID.
 const fetchTokenId = async (
@@ -55,6 +64,7 @@ contract.on("BurnMintToken", async (from, event) => {
     `\naddress = ${name}\ntx      = ${event.transactionHash}\ntokenId = ${tokenId}`
   );
 
+  // Send Discord message.
   const message = new Discord.MessageBuilder()
     .setColor("#bdff00")
     .setFooter(
@@ -67,4 +77,9 @@ contract.on("BurnMintToken", async (from, event) => {
     .setName("Hephaestus");
 
   await discord.send(message);
+
+  // Post Tweet.
+  await twitter.post("statuses/update", {
+    status: `🔥🔨🔥 New Citizen Forged 🔥🔨🔥\n\nToken ID #${tokenId}\n\nhttps://etherscan.io/tx/${event.transactionHash}`,
+  });
 });
