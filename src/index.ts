@@ -3,6 +3,7 @@ import { config } from "dotenv";
 config();
 
 // Import dependencies.
+import axios from "axios";
 import { ethers } from "ethers";
 import Discord from "webhook-discord";
 
@@ -21,11 +22,36 @@ const contract = new ethers.Contract(ADDRESS, ABI, provider);
 // Setup Discord instance.
 const discord = new Discord.Webhook(process.env.DISCORD?.toString()!);
 
+// Helper to fetch token ID.
+const fetchTokenId = async (
+  address: string,
+  transaction: string
+): Promise<string> => {
+  const res = await axios.get(
+    `https://api.etherscan.io/api?module=account&action=tokennfttx&contractaddress=0x355929193308e157760824ba860390924d77fab9&address=${address}&apikey=${process.env.ETHERSCAN}`
+  );
+
+  if (res.data) {
+    const filtered = res.data.result.filter(
+      (item: any) => item.hash === transaction
+    );
+
+    if (filtered.length) {
+      return filtered[0].tokenID.padStart(3, "0");
+    }
+  }
+
+  return "XXX";
+};
+
 // Listen to new events.
 contract.on("BurnMintToken", async (from, event) => {
   const name = (await provider.lookupAddress(from)) || from;
+  const tokenId = await fetchTokenId(from, event.transactionHash);
 
-  console.log(`\naddress = ${name}\ntx      = ${event.transactionHash}\n`);
+  console.log(
+    `\naddress = ${name}\ntx      = ${event.transactionHash}\ntokenId = ${tokenId}`
+  );
 
   const message = new Discord.MessageBuilder()
     .setColor("#bdff00")
@@ -34,7 +60,7 @@ contract.on("BurnMintToken", async (from, event) => {
       "https://ipfs.io/ipfs/QmQmZNp7JNdvYAA8ichVr5bVZUUTfU83zJ8hTZoQfb9YBh"
     )
     .setTitle(":fire::hammer::fire: New Citizen Forged :fire::hammer::fire:")
-    .setDescription(`Token ID #XXX\n\n${name}`)
+    .setDescription(`Token ID #${tokenId}\n\n${name}`)
     .setURL(`https://etherscan.io/tx/${event.transactionHash}`)
     .setName("Hephaestus");
 
