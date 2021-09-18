@@ -27,6 +27,8 @@ const fetchTokenId = async (
   address: string,
   transaction: string
 ): Promise<string> => {
+  let tokenId = "XXX";
+
   const res = await axios.get(
     `https://api.etherscan.io/api?module=account&action=tokennfttx&contractaddress=0x355929193308e157760824ba860390924d77fab9&address=${address}&apikey=${process.env.ETHERSCAN}`
   );
@@ -37,11 +39,11 @@ const fetchTokenId = async (
     );
 
     if (filtered.length) {
-      return filtered[0].tokenID.padStart(3, "0");
+      tokenId = filtered[0].tokenID.padStart(3, "0");
     }
   }
 
-  return "XXX";
+  return tokenId;
 };
 
 // Listen to new events.
