@@ -118,7 +118,7 @@ contract.on("BurnMintToken", async (from, event) => {
     .setURL(`https://etherscan.io/tx/${event.transactionHash}`)
     .setName("Hephaestus");
 
-  await discord.send(message);
+  // await discord.send(message);
 
   // Post Tweet.
   await twitter.post("statuses/update", {
