@@ -4,6 +4,7 @@ config();
 
 // Import dependencies.
 import { ethers } from "ethers";
+import fs from "fs";
 import Twitter from "twitter-lite";
 import Discord from "webhook-discord";
 
@@ -55,6 +56,47 @@ const fetchTokenId = async (address: string): Promise<string> => {
   return "XXX";
 };
 
+// Helper for uploading the Tweet gif.
+const uploadGif = async (): Promise<string> => {
+  const user = new Twitter({
+    subdomain: "upload",
+    consumer_key: process.env.CONSUMER_KEY?.toString()!,
+    consumer_secret: process.env.CONSUMER_SECRET?.toString()!,
+    access_token_key: process.env.ACCESS_KEY?.toString()!,
+    access_token_secret: process.env.ACCESS_SECRET?.toString()!,
+  });
+
+  const { media_id_string } = await user.post("media/upload", {
+    command: "INIT",
+    total_bytes: fs.statSync("forge.mp4").size,
+    media_type: "video/mp4",
+  });
+  await user.post("media/upload", {
+    command: "APPEND",
+    media_id: media_id_string,
+    media_data: fs
+      .readFileSync(`forge.mp4`)
+      .slice(0, 5 * 1024 * 1024)
+      .toString("base64"),
+    segment_index: 0,
+  });
+  await user.post("media/upload", {
+    command: "APPEND",
+    media_id: media_id_string,
+    media_data: fs
+      .readFileSync(`forge.mp4`)
+      .slice(5 * 1024 * 1024)
+      .toString("base64"),
+    segment_index: 1,
+  });
+  await user.post("media/upload", {
+    command: "FINALIZE",
+    media_id: media_id_string,
+  });
+
+  return media_id_string;
+};
+
 // Listen to new events.
 contract.on("BurnMintToken", async (from, event) => {
   const name = (await provider.lookupAddress(from)) || from;
@@ -80,6 +122,7 @@ contract.on("BurnMintToken", async (from, event) => {
 
   // Post Tweet.
   await twitter.post("statuses/update", {
-    status: `🔥🔨🔥 New Citizen Forged 🔥🔨🔥\n\nToken ID #${tokenId}\n\nhttps://etherscan.io/tx/${event.transactionHash}`,
+    status: `New $CTZN #${tokenId} Forged 🔥🔨\n\nkong.land┊@kongiscash\n\nhttps://etherscan.io/tx/${event.transactionHash}`,
+    media_ids: await uploadGif(),
   });
 });
