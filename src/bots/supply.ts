@@ -14,7 +14,7 @@ const bot = new Client({ intents: [] });
 
 bot.on("ready", () => {
   console.log("CitizenSupply connected!");
-  
+
   bot.user?.setPresence({
     activities: [
       {
