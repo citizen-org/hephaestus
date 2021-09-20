@@ -13,7 +13,7 @@ const contract = Contract();
 const bot = new Client({ intents: [] });
 
 bot.on("ready", () => {
-  console.log("CitizenRedeemed connected!");
+  console.log("CitizenSupply connected!");
   
   bot.user?.setPresence({
     activities: [
@@ -26,19 +26,19 @@ bot.on("ready", () => {
 });
 
 // Main program.
-const CitizenRedeemed = async () => {
+const CitizenSupply = async () => {
   const main = async () => {
     const filter = contract.filters.BurnMintToken();
     const res = await contract.queryFilter(filter);
 
-    await bot.user?.setUsername(`${res.length} Redeemed`);
+    await bot.user?.setUsername(`${500 - res.length}/500 Supply`);
 
     setTimeout(main, 1 * 60 * 1000);
   };
 
-  await bot.login(process.env.TOKEN_REDEEMED);
+  await bot.login(process.env.TOKEN_SUPPLY);
   main();
 };
 
 // Export.
-export default CitizenRedeemed;
+export default CitizenSupply;
