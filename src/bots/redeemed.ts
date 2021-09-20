@@ -1,3 +1,7 @@
+// Inject secrets.
+import { config } from "dotenv";
+config();
+
 // Import dependencies.
 import { Client } from "discord.js";
 import { Contract } from "../utils";
