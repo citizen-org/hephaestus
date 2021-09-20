@@ -33,7 +33,7 @@ const CitizenSupply = async () => {
 
     await bot.user?.setUsername(`Supply ${500 - res.length}/500`);
 
-    setTimeout(main, 1 * 60 * 1000);
+    setTimeout(main, 5 * 60 * 1000);
   };
 
   await bot.login(process.env.TOKEN_SUPPLY);

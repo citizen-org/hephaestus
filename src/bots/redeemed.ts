@@ -33,7 +33,7 @@ const CitizenRedeemed = async () => {
 
     await bot.user?.setUsername(`Redeemed ${res.length}`);
 
-    setTimeout(main, 1 * 60 * 1000);
+    setTimeout(main, 5 * 60 * 1000);
   };
 
   await bot.login(process.env.TOKEN_REDEEMED);
