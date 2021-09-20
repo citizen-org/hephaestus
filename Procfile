@@ -1,1 +1,1 @@
-main: yarn start
+main: yarn start:heroku
