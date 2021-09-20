@@ -3,6 +3,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "start:bots": "node dist/bots.js",
+    "start:heroku": "node dist/index.js & node dist/bots.js",
     "format": "prettier --write ."
   },
   "dependencies": {
