@@ -31,7 +31,7 @@ const CitizenSupply = async () => {
     const filter = contract.filters.BurnMintToken();
     const res = await contract.queryFilter(filter);
 
-    await bot.user?.setUsername(`${500 - res.length}/500 Supply`);
+    await bot.user?.setUsername(`Supply ${500 - res.length}/500`);
 
     setTimeout(main, 1 * 60 * 1000);
   };

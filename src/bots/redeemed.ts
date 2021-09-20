@@ -31,7 +31,7 @@ const CitizenRedeemed = async () => {
     const filter = contract.filters.BurnMintToken();
     const res = await contract.queryFilter(filter);
 
-    await bot.user?.setUsername(`${res.length} Redeemed`);
+    await bot.user?.setUsername(`Redeemed ${res.length}`);
 
     setTimeout(main, 1 * 60 * 1000);
   };
