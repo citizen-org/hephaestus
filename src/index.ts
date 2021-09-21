@@ -68,26 +68,14 @@ const uploadGif = async (): Promise<string> => {
 
   const { media_id_string } = await user.post("media/upload", {
     command: "INIT",
-    total_bytes: fs.statSync("forge.mp4").size,
+    total_bytes: fs.statSync("forgeCompressed.mp4").size,
     media_type: "video/mp4",
   });
   await user.post("media/upload", {
     command: "APPEND",
     media_id: media_id_string,
-    media_data: fs
-      .readFileSync(`forge.mp4`)
-      .slice(0, 5 * 1024 * 1024)
-      .toString("base64"),
+    media_data: fs.readFileSync("forgeCompressed.mp4").toString("base64"),
     segment_index: 0,
-  });
-  await user.post("media/upload", {
-    command: "APPEND",
-    media_id: media_id_string,
-    media_data: fs
-      .readFileSync(`forge.mp4`)
-      .slice(5 * 1024 * 1024)
-      .toString("base64"),
-    segment_index: 1,
   });
   await user.post("media/upload", {
     command: "FINALIZE",
