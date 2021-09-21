@@ -32,7 +32,7 @@ const CitizenRedeemed = async () => {
     const res = await contract.queryFilter(filter);
 
     try {
-      await bot.user?.setUsername(`Redeemed ${res.length}`);
+      await bot.user?.setUsername(`${res.length} Redeemed`);
     } catch {}
 
     setTimeout(main, 1 * 60 * 1000);
