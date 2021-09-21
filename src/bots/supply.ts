@@ -32,7 +32,7 @@ const CitizenSupply = async () => {
     const res = await contract.queryFilter(filter);
 
     try {
-      await bot.user?.setUsername(`Supply ${500 - res.length}/500`);
+      await bot.user?.setUsername(`Remaining ${500 - res.length}/500`);
     } catch {}
 
     setTimeout(main, 1 * 60 * 1000);
