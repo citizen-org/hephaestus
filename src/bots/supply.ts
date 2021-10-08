@@ -44,7 +44,7 @@ const CitizenSupply = async () => {
 
   const guild = client.guilds.cache.get("837757696295698462")!;
   bot = await guild.members.fetch({
-    user: "889620711721824337",
+    user: "889632374026010644",
   });
 
   main();
