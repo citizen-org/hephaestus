@@ -3,19 +3,19 @@ import { config } from "dotenv";
 config();
 
 // Import dependencies.
-import { Client } from "discord.js";
+import { Client, GuildMember } from "discord.js";
 import { Contract } from "../utils";
 
 // Setup contract instance.
 const contract = Contract();
 
 // Setup Discord.js instance.
-const bot = new Client({ intents: [] });
+const client = new Client({ intents: [] });
 
-bot.on("ready", () => {
+client.on("ready", () => {
   console.log("CitizenRedeemed connected!");
 
-  bot.user?.setPresence({
+  client.user?.setPresence({
     activities: [
       {
         name: "$CITIZEN burns",
@@ -27,18 +27,26 @@ bot.on("ready", () => {
 
 // Main program.
 const CitizenRedeemed = async () => {
+  let bot: GuildMember;
+
   const main = async () => {
     const filter = contract.filters.BurnMintToken();
     const res = await contract.queryFilter(filter);
 
     try {
-      await bot.user?.setUsername(`${res.length} Redeemed`);
+      await bot.setNickname(`${res.length} Redeemed`);
     } catch {}
 
     setTimeout(main, 1 * 60 * 1000);
   };
 
-  await bot.login(process.env.TOKEN_REDEEMED);
+  await client.login(process.env.TOKEN_REDEEMED);
+
+  const guild = client.guilds.cache.get("837757696295698462")!;
+  bot = await guild.members.fetch({
+    user: "889620711721824337",
+  });
+
   main();
 };
 
