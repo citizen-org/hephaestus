@@ -4,10 +4,10 @@ config();
 
 // Import dependencies.
 import { Client, GuildMember } from "discord.js";
-import { Contract } from "../utils";
+import { BurnMintCitizen } from "../utils";
 
 // Setup contract instance.
-const contract = Contract();
+const contract = BurnMintCitizen();
 
 // Setup Discord.js instance.
 const client = new Client({ intents: [] });
